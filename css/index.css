@@ -700,6 +700,8 @@ body {
   margin: 0 auto;
   border-collapse: collapse;
   font-size: 1.25rem;
+  width: 100%;
+  max-width: 830px;
 }
 
 .shoppingCart-table th,

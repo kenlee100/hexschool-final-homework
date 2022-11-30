@@ -759,7 +759,7 @@ body {
 }
 
 .discardAllBtn {
-  display: inline-block;
+  display: none;
   text-decoration: none;
   padding: 5px 15px;
   color: #000000;
@@ -773,6 +773,9 @@ body {
   color: #ffffff;
 }
 
+.discardAllBtn.-show {
+  display: inline-block;
+}
 .orderInfo {
   padding: 60px 0;
 }
@@ -903,5 +906,53 @@ body {
 
 .orderTableWrap::-webkit-scrollbar {
   display: none;
+}
+
+.loading {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  background-color: rgb(48 30 95 / 60%);
+  z-index: 1000;
+}
+.loading.-show {
+  display: flex;
+}
+.loader {
+  width: 80px;
+  height: 80px;
+  position: relative;
+}
+.loader::after,
+.loader::before {
+  content: '';
+  box-sizing: border-box;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  position: absolute;
+  left: 0;
+  top: 0;
+  animation: animloader 2s linear infinite;
+}
+.loader::after {
+  animation-delay: 1s;
+}
+
+@keyframes animloader {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
 }
 /*# sourceMappingURL=all.css.map */

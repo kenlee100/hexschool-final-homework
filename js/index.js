@@ -59,7 +59,6 @@ function getProductList() {
       progress(res, () => {
         productData = res.data.products;
         renderProductList(productData);
-        console.log(productData);
       });
     })
     .catch((err) => {
@@ -84,7 +83,7 @@ function addCartItem(productId, count, productTitle) {
       progress(res, () => {
         cartData = res.data;
         renderCartList(cartData);
-        console.log(`${productTitle} 已加入購物車`, res.data);
+        alert(`${productTitle} 已加入購物車`, res.data);
       });
     })
     .catch((err) => {
@@ -103,7 +102,6 @@ function getCartList() {
       progress(res, () => {
         cartData = res.data;
         renderCartList(cartData);
-        // console.log('getCartList', cartData);
       });
     })
     .catch((err) => {
@@ -126,7 +124,6 @@ function editCartList(cartId, count) {
     )
     .then((res) => {
       progress(res, () => {
-        // console.log(res.data);
         cartData = res.data;
         renderCartList(cartData);
       });
@@ -145,7 +142,6 @@ function deleteAllCartList() {
     )
     .then((res) => {
       progress(res, () => {
-        // console.log(res.data);
         cartData = res.data;
         renderCartList(cartData);
       });
@@ -192,7 +188,6 @@ function createOrder(data) {
       }
     )
     .then((res) => {
-      console.log(res.data);
       progress(res, () => {
         orderInfoForm.reset();
         getCartList();
@@ -208,7 +203,6 @@ function createOrder(data) {
 function renderProductList(data) {
   let str = '';
   data.forEach((item) => {
-    // console.log(item);
     str += `
     <li class="productCard">
       <h4 class="productType">新品</h4>
@@ -246,7 +240,9 @@ function renderCartList(data) {
       </td>
       <td>NT$${toThousands(item.quantity * item.product.price)}</td>
       <td class="discardBtn">
-        <a href="#" class="material-icons" data-id="${item.id}">
+        <a href="#" class="material-icons" data-id="${item.id}" data-title="${
+      item.product.title
+    }">
           clear
         </a>
       </td>
@@ -280,7 +276,6 @@ cartLisBody.addEventListener('change', (e) => {
   if (!e.target.classList.contains('input-step')) {
     return;
   }
-  console.log(cartId);
   editCartList(cartId, parseInt(e.target.value));
 });
 
@@ -305,7 +300,7 @@ productWrap.addEventListener('click', (e) => {
   if (!e.target.classList.contains('addCardBtn')) {
     return;
   }
-  // console.log(productId);
+
   let count = 1;
   cartData.carts.forEach((item) => {
     if (productId === item.product.id) {
@@ -319,18 +314,22 @@ productWrap.addEventListener('click', (e) => {
 shoppingCartTable.addEventListener('click', (e) => {
   e.preventDefault();
   const productId = e.target.getAttribute('data-id');
+  const productTitle = e.target.getAttribute('data-title');
   if (e.target.classList.contains('material-icons')) {
-    deleteCartItem(productId);
+    confirmDialog(`要將 ${productTitle} 從購物車中移除？`, () => {
+      deleteCartItem(productId);
+    });
     return;
   }
   if (e.target.classList.contains('discardAllBtn')) {
-    deleteAllCartList();
+    confirmDialog(`確定清除購物車？`, () => {
+      deleteAllCartList();
+    });
   }
 });
 
 // 表單驗證訊息顯示開閉
 function inputValidToggle(el) {
-  console.log(errors);
   if (errors[el.getAttribute('data-message')] === undefined) {
     el.classList.remove('-show');
     el.textContent = '';
@@ -365,11 +364,10 @@ orderInfoBtn.addEventListener('click', (e) => {
       return;
     }
     errors = validate(orderInfoForm, constraints) || '';
-    inputValidToggle(validMsg, errors);
+    inputValidToggle(validMsg);
   });
 
   const inputCheck = Object.values(obj).every((item) => {
-    // console.log(item);
     return item !== '';
   });
   if (inputCheck && errors === '') {
@@ -378,6 +376,15 @@ orderInfoBtn.addEventListener('click', (e) => {
   }
 });
 
+// 確認訊息 彈窗
+function confirmDialog(msg, callback, params) {
+  let check = confirm(msg);
+  if (check) {
+    callback(params);
+  }
+}
+
+// loading
 function loadingStatus(isShow) {
   if (isShow) {
     loading.classList.add('-show');
@@ -386,6 +393,7 @@ function loadingStatus(isShow) {
   }
 }
 
+// loading callback
 function progress(res, callback) {
   if (res.status === 200) {
     callback(res);
