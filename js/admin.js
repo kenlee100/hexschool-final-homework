@@ -1,9 +1,15 @@
-const api_path = 'ken100';
-const token = 'JAQDheFa4wNMdLunGZgewHpABK02';
+import {
+  confirmDialog,
+  progress,
+  loadingStatus,
+  timestampConvert,
+} from "./utilities.js";
+import { config } from "./config.js";
 
-const orderListBody = document.querySelector('.orderListBody');
-const discardAllBtn = document.querySelector('.discardAllBtn');
-const loading = document.querySelector('.loading');
+const api_path = "ken100";
+const orderListBody = document.querySelector(".orderListBody");
+const discardAllBtn = document.querySelector(".discardAllBtn");
+
 let orderData = [];
 
 // 取得訂單列表
@@ -12,11 +18,7 @@ function getOrderList() {
   axios
     .get(
       `https://livejs-api.hexschool.io/api/livejs/v1/admin/${api_path}/orders`,
-      {
-        headers: {
-          Authorization: token,
-        },
-      }
+      config
     )
     .then((res) => {
       progress(res, () => {
@@ -64,13 +66,13 @@ function renderC3_LV2() {
       }
     });
     newData.splice(3);
-    newData.push(['其他', otherTotal]);
+    newData.push(["其他", otherTotal]);
   }
   console.log(newData);
   const chart = c3.generate({
-    bindto: '#chart', // HTML 元素綁定
+    bindto: "#chart", // HTML 元素綁定
     data: {
-      type: 'pie',
+      type: "pie",
       columns: newData,
     },
   });
@@ -88,11 +90,7 @@ function editOrderList(orderId, status) {
           paid: payStatus(status),
         },
       },
-      {
-        headers: {
-          Authorization: token,
-        },
-      }
+      config
     )
     .then((res) => {
       getOrderList();
@@ -108,11 +106,7 @@ function deleteOrderItem(orderId) {
   axios
     .delete(
       `https://livejs-api.hexschool.io/api/livejs/v1/admin/${api_path}/orders/${orderId}`,
-      {
-        headers: {
-          Authorization: token,
-        },
-      }
+      config
     )
     .then((res) => {
       getOrderList();
@@ -128,11 +122,7 @@ function deleteAllOrder() {
   axios
     .delete(
       `https://livejs-api.hexschool.io/api/livejs/v1/admin/${api_path}/orders`,
-      {
-        headers: {
-          Authorization: token,
-        },
-      }
+      config
     )
     .then((res) => {
       getOrderList();
@@ -142,15 +132,15 @@ function deleteAllOrder() {
     });
 }
 function renderOrderList(data) {
-  let tbody = '';
+  let tbody = "";
   if (data.length === 0) {
-    discardAllBtn.classList.remove('-show');
+    discardAllBtn.classList.remove("-show");
   } else {
-    discardAllBtn.classList.add('-show');
+    discardAllBtn.classList.add("-show");
   }
   data.forEach((item) => {
-    let productList = '';
-    let status = item.paid ? '已處理' : '未處理';
+    let productList = "";
+    let status = item.paid ? "已處理" : "未處理";
     item.products.forEach((productItem, index) => {
       if (item.products.length > 1) {
         productList += `
@@ -200,8 +190,8 @@ function renderOrderList(data) {
 
 // 訂單狀態
 function payStatus(status) {
-  let newStatus = '';
-  if (status === 'false') {
+  let newStatus = "";
+  if (status === "false") {
     newStatus = true;
   } else {
     newStatus = false;
@@ -209,72 +199,27 @@ function payStatus(status) {
   return newStatus;
 }
 
-orderListBody.addEventListener('click', (e) => {
+orderListBody.addEventListener("click", (e) => {
   e.preventDefault();
-  const status = e.target.getAttribute('data-status');
-  const orderId = e.target.getAttribute('data-id');
-  const createdAt = e.target.getAttribute('data-createdAt');
-  if (e.target.hasAttribute('data-status')) {
+  const status = e.target.getAttribute("data-status");
+  const orderId = e.target.getAttribute("data-id");
+  const createdAt = e.target.getAttribute("data-createdAt");
+  if (e.target.hasAttribute("data-status")) {
     editOrderList(orderId, status);
   }
 
-  if (e.target.classList.contains('delSingleOrder-Btn')) {
+  if (e.target.classList.contains("delSingleOrder-Btn")) {
     confirmDialog(`確定刪除 ${createdAt} 訂單？`, () => {
       deleteOrderItem(orderId);
     });
   }
 });
-discardAllBtn.addEventListener('click', (e) => {
+discardAllBtn.addEventListener("click", (e) => {
   e.preventDefault();
-  confirmDialog('確定清除全部訂單？', deleteAllOrder);
+  confirmDialog("確定清除全部訂單？", deleteAllOrder);
 });
-
-// 確認訊息 彈窗
-function confirmDialog(msg, callback, params) {
-  let check = confirm(msg);
-  if (check) {
-    callback(params);
-  }
-}
-
-// loading
-function loadingStatus(isShow) {
-  if (isShow) {
-    loading.classList.add('-show');
-  } else {
-    loading.classList.remove('-show');
-  }
-}
-
-// loading callback
-function progress(res, callback) {
-  if (res.status === 200) {
-    callback(res);
-    setTimeout(() => {
-      loadingStatus(false);
-    }, 500);
-  }
-}
 
 function init() {
   getOrderList();
 }
 init();
-
-// 時間小於 9 時前面補上0
-function timePlusZero(time) {
-  if (time <= 9) {
-    time = `0${time}`;
-  }
-  return time;
-}
-// timestamp格式轉換
-function timestampConvert(time) {
-  const date = new Date(time * 1000);
-  const h = date.getHours();
-  const m = date.getMinutes();
-  const s = date.getSeconds();
-  return `${date.getFullYear()}/${
-    date.getMonth() + 1
-  }/${date.getDate()} ${timePlusZero(h)}:${timePlusZero(m)}:${timePlusZero(s)}`;
-}
