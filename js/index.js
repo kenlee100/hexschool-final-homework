@@ -4,7 +4,7 @@ import {
   loadingStatus,
   toThousands,
 } from "./utilities.js";
-const api_path = "ken100";
+import { api_path } from "./config.js";
 
 let productData = [];
 let cartData = [];

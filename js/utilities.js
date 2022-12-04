@@ -50,3 +50,7 @@ export function toThousands(n) {
   parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   return parts.join(".");
 }
+
+export function taiwanPhoneCheck(str) {
+  return /^09\d{2}-?\d{3}-?\d{3}$/.test(str);
+}

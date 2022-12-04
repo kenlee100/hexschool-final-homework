@@ -4,21 +4,19 @@ import {
   loadingStatus,
   timestampConvert,
 } from "./utilities.js";
-import { config } from "./config.js";
+import { api_path, configHeaders } from "./config.js";
 
-const api_path = "ken100";
 const orderListBody = document.querySelector(".orderListBody");
 const discardAllBtn = document.querySelector(".discardAllBtn");
 
 let orderData = [];
-
 // 取得訂單列表
 function getOrderList() {
   loadingStatus(true);
   axios
     .get(
       `https://livejs-api.hexschool.io/api/livejs/v1/admin/${api_path}/orders`,
-      config
+      configHeaders
     )
     .then((res) => {
       progress(res, () => {
@@ -68,7 +66,6 @@ function renderC3_LV2() {
     newData.splice(3);
     newData.push(["其他", otherTotal]);
   }
-  console.log(newData);
   const chart = c3.generate({
     bindto: "#chart", // HTML 元素綁定
     data: {
@@ -90,7 +87,7 @@ function editOrderList(orderId, status) {
           paid: payStatus(status),
         },
       },
-      config
+      configHeaders
     )
     .then((res) => {
       getOrderList();
@@ -106,7 +103,7 @@ function deleteOrderItem(orderId) {
   axios
     .delete(
       `https://livejs-api.hexschool.io/api/livejs/v1/admin/${api_path}/orders/${orderId}`,
-      config
+      configHeaders
     )
     .then((res) => {
       getOrderList();
@@ -122,7 +119,7 @@ function deleteAllOrder() {
   axios
     .delete(
       `https://livejs-api.hexschool.io/api/livejs/v1/admin/${api_path}/orders`,
-      config
+      configHeaders
     )
     .then((res) => {
       getOrderList();
